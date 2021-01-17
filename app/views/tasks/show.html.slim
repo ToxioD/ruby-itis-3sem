@@ -1,0 +1,29 @@
+.task_title
+  h1
+    = @task.title
+    - if @task.done
+      img(src="#{image_path('done.png')}" style='width:25px')
+    - else
+      img(src="#{image_path('not_done.jpg')}" style="width:25px")
+  div
+    - if !@task.done && TaskPolicy.new(@task, current_user).can_use?
+      => link_to 'Done', task_done_path(@task), method: :patch, id: "Make_done"
+.task_content
+  p
+    = @task.content
+
+div
+  strong
+    |Published: #{@task.created_at}
+
+hr
+- @task.comments.each do |comment|
+  .comment_content
+  = comment.content
+  - if CommentPolicy.new(comment, current_user).can_use?
+    .buttons
+      => link_to 'Edit', edit_task_comment_path(id: comment.id, task_id: @task.id), class: "edit"
+      => link_to 'Destroy', task_comment_path(id: comment.id, task_id: @task.id), method: :delete, data: { confirm: 'Are you sure?' }
+  hr
+
+= render "comments/comments_form"
